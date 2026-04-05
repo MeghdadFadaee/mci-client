@@ -1,0 +1,80 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }} - ${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            arch: amd64
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-latest
+            arch: arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install pyinstaller requests python-dotenv
+
+      - name: Build binary
+        run: |
+          pyinstaller --onedir --noconsole --name mci-client --icon icon.ico main.py
+
+      - name: Archive dist (Linux)
+        if: runner.os != 'Windows'
+        run: |
+          cp .env.example dist/mci-client/
+          cd dist
+          zip -r ../mci-client-${{ matrix.os }}-${{ matrix.arch }}.zip .
+
+      - name: Archive dist (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          copy .env.example dist\mci-client\
+          Compress-Archive -Path dist\* -DestinationPath mci-client.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zip-${{ matrix.os }}-${{ matrix.arch }}
+          path: "*.zip"
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List files
+        run: ls -R artifacts
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
