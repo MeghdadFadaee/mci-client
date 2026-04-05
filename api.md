@@ -7,7 +7,13 @@
 ```bash
 curl 'https://my.mci.ir/api/idm/v1/auth' \
   -X POST \
+  -H 'User-Agent: Mozilla/5.0' \
+  -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
+  -H 'Origin: https://my.mci.ir' \
+  -H 'Referer: https://my.mci.ir' \
+  -H 'platform: WEB' \
+  -H 'version: 1.29.0' \
   --data-raw '{"username":"9123456789","credential":"xxxx","credential_type":"PASSWORD"}'
 ```
 
@@ -33,7 +39,13 @@ curl 'https://my.mci.ir/api/idm/v1/auth' \
 curl 'https://my.mci.ir/api/idm/v1/auth' \
   -X POST \
   -H 'Authorization: Bearer eyJhbG...' \
+  -H 'User-Agent: Mozilla/5.0' \
+  -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
+  -H 'Origin: https://my.mci.ir' \
+  -H 'Referer: https://my.mci.ir' \
+  -H 'platform: WEB' \
+  -H 'version: 1.29.0' \
   --data-raw '{"username":"9123456789","credential_type":"REFRESH_TOKEN","credential":"eyJhbG..."}'
 ```
 
@@ -59,6 +71,13 @@ curl 'https://my.mci.ir/api/idm/v1/auth' \
 
 ```bash
 curl 'https://my.mci.ir/api/unit/v1/packages/details' \
+  -H 'User-Agent: Mozilla/5.0' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://my.mci.ir' \
+  -H 'Referer: https://my.mci.ir' \
+  -H 'platform: WEB' \
+  -H 'version: 1.29.0' \
   -H 'Authorization: Bearer eyJhbG...'
 ```
 

@@ -86,6 +86,18 @@ class MCIInternetClient:
         self.env = DotEnvStore(env_path)
         self.session = requests.Session()
 
+        """
+        """
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Origin": "https://my.mci.ir",
+            "Referer": "https://my.mci.ir/",
+            "platform": "WEB",
+            "version": "1.29.0",
+        })
+
         self.username = self._require_env("MCI_USERNAME")
         self.password = self._require_env("MCI_PASSWORD")
 
@@ -146,10 +158,7 @@ class MCIInternetClient:
         self.env.save()
 
     def _auth_request(self, body: dict[str, Any], bearer_token: Optional[str] = None) -> dict[str, Any]:
-        headers = {
-            'User-Agent': 'Mozilla/5.0',
-            'Accept': 'application/json',
-        }
+        headers = {}
         if bearer_token:
             headers["Authorization"] = f"Bearer {bearer_token}"
 
@@ -209,12 +218,7 @@ class MCIInternetClient:
 
     def _get_packages_details(self) -> dict[str, Any]:
         token = self.ensure_token()
-        headers = {
-            'User-Agent': 'Mozilla/5.0',
-            'Accept': 'application/json',
-            "Authorization": f"Bearer {token}",
-        }
-
+        headers = {"Authorization": f"Bearer {token}"}
         response = self.session.get(self.PACKAGES_URL, headers=headers, timeout=30)
 
         if response.status_code == 401:
