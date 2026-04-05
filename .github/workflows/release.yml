@@ -53,7 +53,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           copy .env.example dist\mci-client\
-          Compress-Archive -Path dist\* -DestinationPath mci-client.zip
+          Compress-Archive -Path dist\* -DestinationPath mci-client-${{ matrix.os }}-${{ matrix.arch }}.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
