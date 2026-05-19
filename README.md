@@ -1,38 +1,29 @@
 # MCI Internet Packages Client
 
-A lightweight Python client to fetch **unused internet package bytes**
-from MCI (`my.mci.ir`) API.
-
-------------------------------------------------------------------------
+Rust client for fetching unused internet package bytes from the MCI
+(`my.mci.ir`) API.
 
 ## Features
 
-- Login + Refresh token handling
-- ️Reuses existing session (avoids unnecessary login)
-- Extracts all `unusedAmount` values from response
-- Automatically stores tokens in `.env`
-- Retry on expired session
-
-------------------------------------------------------------------------
+- Login and refresh-token handling
+- Reuses valid saved sessions
+- Stores refreshed tokens in `.env`
+- Retries package fetches once after a 401 response
+- Extracts every `unusedAmount` value from the response tree
+- Runs as a terminal-less Windows tray app
+- Shows startup, credential, network, and API errors inside the overlay label
+- Provides tray actions for Manage App, Reload, Reset Session, and Quit
 
 ## Requirements
 
-- Python 3.10+
-- `requests`
+- Rust 1.95+
+- Internet access to `https://my.mci.ir`
 
-Install dependencies:
-
-``` bash
-pip install requests python-dotenv
-```
-
-------------------------------------------------------------------------
-
-## Environment Variables
+## Environment
 
 Create a `.env` file:
 
-``` env
+```env
 MCI_USERNAME="9123456789"
 MCI_PASSWORD="your_password"
 
@@ -41,41 +32,64 @@ MCI_REFRESH_TOKEN=""
 MCI_SESSION_STATE=""
 MCI_ACCESS_TOKEN_EXPIRES_AT=""
 MCI_REFRESH_TOKEN_EXPIRES_AT=""
+
+PULL_INTERVAL_SECONDS=10
+
+MCI_LABEL_FONT_FAMILY="IRANSansWeb"
+MCI_LABEL_FONT_SIZE=14
 ```
 
-------------------------------------------------------------------------
+## Build
+
+```bash
+cargo build --release
+```
+
+## Installers
+
+Tagged GitHub releases build Windows artifacts automatically:
+
+- `mci-client-<version>-windows-x64-portable.zip`
+- `mci-client-<version>-windows-x64-setup.exe`
+- `mci-client-<version>-windows-x64.msi`
+- `mci-client-<version>-windows-x64-setup-bundle.zip`
+
+Create a release by pushing a tag like `v0.1.0`.
 
 ## Usage
 
-``` python
-from client import MCIInternetClient
+Build and run the app:
 
-client = MCIInternetClient(".env")
-
-unused_bytes = client.get_unused_amounts_bytes()
-
-print(unused_bytes)
+```bash
+cargo build --release
+target\release\mci-client.exe
 ```
 
-------------------------------------------------------------------------
+The app starts as a floating always-on-top label and adds a tray icon. Use the
+tray menu to manage it:
 
-## How It Works
+- Manage App: edit username, password, pull interval, label font, and label size
+- Reload: fetch package data immediately
+- Reset Session: clear saved tokens, then fetch again
+- Quit: exit the app
 
-1. Tries existing `access_token`
-2. If expired → tries `refresh_token`
-3. If that fails → logs in again
-4. Saves new tokens to `.env`
+Options:
 
-------------------------------------------------------------------------
+```bash
+cargo run --release -- --interval 30 gui
+cargo run --release -- --env path\to\.env gui
+```
+
+If no command is provided, `gui` is used by default.
 
 ## Notes
 
-- This API may require:
-    - Iranian IP 🇮🇷
-    - Proper headers (User-Agent, Origin, Referer, platform, version)
-- If you get SSL errors → check headers and waite for some minutes
-
-------------------------------------------------------------------------
+- The MCI API may require an Iranian IP address and the browser-like headers
+  used by this client.
+- Tokens are written back to `.env` with a 30-second expiry safety buffer.
+- GUI and tray mode are implemented with native Win32 APIs.
+- `icon.ico` is loaded for the window and tray icon at runtime. The build also
+  embeds it into the executable when the Windows SDK `rc.exe` tool is available.
 
 ## License
 
