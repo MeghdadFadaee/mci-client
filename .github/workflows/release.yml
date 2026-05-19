@@ -71,13 +71,14 @@ jobs:
           $appDir = Join-Path $PWD.Path "dist\app"
           $msiPath = Join-Path $PWD.Path "dist\mci-client-$env:APP_VERSION-windows-x64.msi"
 
-          wix build "installer\wix\mci-client.wxs" `
+          wix build `
             -arch x64 `
-            "-dSourceDir=$appDir" `
-            "-dProductName=MCI Client" `
-            "-dManufacturer=MCI Client" `
-            "-dVersion=$env:APP_VERSION" `
-            -o $msiPath
+            -d "SourceDir=$appDir" `
+            -d "ProductName=MCI Client" `
+            -d "Manufacturer=MCI Client" `
+            -d "Version=$env:APP_VERSION" `
+            -o $msiPath `
+            "installer\wix\mci-client.wxs"
 
       - name: Install Inno Setup
         shell: pwsh
